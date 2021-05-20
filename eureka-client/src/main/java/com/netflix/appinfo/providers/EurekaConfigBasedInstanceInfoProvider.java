@@ -45,6 +45,10 @@ public class EurekaConfigBasedInstanceInfoProvider implements Provider<InstanceI
         this.config = config;
     }
 
+    /**
+     * 构建 InstanceInfo 应用实例信息
+     * @return
+     */
     @Override
     public synchronized InstanceInfo get() {
         if (instanceInfo == null) {

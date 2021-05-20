@@ -48,7 +48,9 @@ public class ExampleEurekaClient {
 
     private static synchronized ApplicationInfoManager initializeApplicationInfoManager(EurekaInstanceConfig instanceConfig) {
         if (applicationInfoManager == null) {
+            //构建实例信息
             InstanceInfo instanceInfo = new EurekaConfigBasedInstanceInfoProvider(instanceConfig).get();
+            //基于实例信息和实例的配置 构建应用信息管理
             applicationInfoManager = new ApplicationInfoManager(instanceConfig, instanceInfo);
         }
 
@@ -117,8 +119,14 @@ public class ExampleEurekaClient {
     public static void main(String[] args) {
         ExampleEurekaClient sampleClient = new ExampleEurekaClient();
 
-        // create the client
-        ApplicationInfoManager applicationInfoManager = initializeApplicationInfoManager(new MyDataCenterInstanceConfig());
+
+        //new MyDataCenterInstanceConfig() 读取eureka-client.properties的配置文件配置DataCenterInstanceConfig(
+        //基于EurekaInstanceConfig 构建 InstanceInfo
+        //基于 EurekaInstanceConfig 、InstanceInfo 构建出ApplicationManager
+        ApplicationInfoManager applicationInfoManager = initializeApplicationInfoManager(
+            new MyDataCenterInstanceConfig());
+        //new DefaultEurekaClientConfig() 再次读取eureka-client.properties 配置EurekaClientConfig的配置
+        //基于ApplicationManager 和 EurekaClientConfig 初始化EurekaClient
         EurekaClient client = initializeEurekaClient(applicationInfoManager, new DefaultEurekaClientConfig());
 
         // use the client
