@@ -42,10 +42,12 @@ public class DefaultServerCodecs implements ServerCodecs {
         );
     }
 
-    protected DefaultServerCodecs(CodecWrapper fullJsonCodec,
-                                  CodecWrapper compactJsonCodec,
-                                  CodecWrapper fullXmlCodec,
-                                  CodecWrapper compactXmlCodec) {
+
+    protected DefaultServerCodecs(CodecWrapper fullJsonCodec,//完整的json编解码处理器
+                                  CodecWrapper compactJsonCodec,//紧凑型的json编解码处理器
+                                  CodecWrapper fullXmlCodec,//完整的xml编解码处理器
+                                  CodecWrapper compactXmlCodec //紧凑型的XML编解码处理器
+    ) {
         this.fullJsonCodec = fullJsonCodec;
         this.compactJsonCodec = compactJsonCodec;
         this.fullXmlCodec = fullXmlCodec;

@@ -63,6 +63,8 @@ import javax.inject.Singleton;
 import static com.netflix.eureka.Names.METRIC_REGISTRY_PREFIX;
 
 /**
+ * 处理拷贝所有节点的运行信息(注册的服务信息)的同步
+ *
  * Handles replication of all operations to {@link AbstractInstanceRegistry} to peer
  * <em>Eureka</em> nodes to keep them all in sync.
  *
@@ -116,6 +118,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
         }
     };
 
+    //1分钟的计数器
     private final MeasuredRate numberOfReplicationsLastMin;
 
     protected final EurekaClient eurekaClient;
@@ -138,6 +141,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
         this.numberOfReplicationsLastMin = new MeasuredRate(1000 * 60 * 1);
         // We first check if the instance is STARTING or DOWN, then we check explicit overrides,
         // then we check the status of a potentially existing lease.
+        //检查相关
         this.instanceStatusOverrideRule = new FirstMatchWinsCompositeRule(new DownOrStartingRule(),
                 new OverrideExistsRule(overriddenInstanceStatusMap), new LeaseExistsRule());
     }
@@ -147,15 +151,24 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
         return this.instanceStatusOverrideRule;
     }
 
+    /**
+     * 初始化兄弟节点信息
+     * @param peerEurekaNodes
+     * @throws Exception
+     */
     @Override
     public void init(PeerEurekaNodes peerEurekaNodes) throws Exception {
-        this.numberOfReplicationsLastMin.start();
+        this.numberOfReplicationsLastMin.start();//启动计数
         this.peerEurekaNodes = peerEurekaNodes;
+        //初始化一个缓存 存疑
         initializedResponseCache();
+        //执行续约阈值更新任务 存疑
         scheduleRenewalThresholdUpdateTask();
+        //初始化远程区域注册表 存疑
         initRemoteRegionRegistry();
 
         try {
+            //启动监控
             Monitors.registerObject(this);
         } catch (Throwable e) {
             logger.warn("Cannot register the JMX monitor for the InstanceRegistry :", e);
@@ -163,6 +176,8 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     }
 
     /**
+     * 执行所有的清理和关闭操作
+     *
      * Perform all cleanup and shutdown operations.
      */
     @Override
@@ -184,6 +199,8 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     }
 
     /**
+     * 每一段时间执行 续约阈值 的任务
+     *
      * Schedule the task that updates <em>renewal threshold</em> periodically.
      * The renewal threshold would be used to determine if the renewals drop
      * dramatically because of network partition and to protect expiring too
@@ -201,6 +218,9 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     }
 
     /**
+     *  填充注册表信息从对等的eureka节点
+     *  这个操作执行失败直到 其它节点都被尝试通讯失败
+     *
      * Populates the registry information from a peer eureka node. This
      * operation fails over to other nodes until the list is exhausted if the
      * communication fails.
@@ -219,6 +239,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
                     break;
                 }
             }
+            //同步所有节点的注册表
             Applications apps = eurekaClient.getApplications();
             for (Application app : apps.getRegisteredApplications()) {
                 for (InstanceInfo instance : app.getInstances()) {
@@ -524,6 +545,8 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     }
 
     /**
+     * 更新续约的阈值
+     *
      * Updates the <em>renewal threshold</em> based on the current number of
      * renewals. The threshold is a percentage as specified in
      * {@link EurekaServerConfig#getRenewalPercentThreshold()} of renewals

@@ -63,6 +63,8 @@ public class EndpointUtils {
     }
 
     /**
+     * 获取eureka server的url列表
+     *
      * Get the list of all eureka service urls for the eureka client to talk to.
      *
      * @param clientConfig the clientConfig to use
@@ -180,6 +182,8 @@ public class EndpointUtils {
     }
 
     /**
+     * 获取eureka server的url配置（可配置多个）
+     *
      * Get the list of all eureka service urls from properties file for the eureka client to talk to.
      *
      * @param clientConfig the clientConfig to use

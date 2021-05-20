@@ -87,6 +87,7 @@ public class PeerEurekaNode {
         this(registry, targetHost, serviceUrl, replicationClient, config, BATCH_SIZE, MAX_BATCHING_DELAY_MS, RETRY_SLEEP_TIME_MS, SERVER_UNAVAILABLE_SLEEP_TIME_MS);
     }
 
+    //主要是开辟各种资源和调度任务
     /* For testing */ PeerEurekaNode(PeerAwareInstanceRegistry registry, String targetHost, String serviceUrl,
                                      HttpReplicationClient replicationClient, EurekaServerConfig config,
                                      int batchSize, long maxBatchingDelayMs,
@@ -344,6 +345,8 @@ public class PeerEurekaNode {
     }
 
     /**
+     *  关闭某个对EurekaServer节点开辟的资源
+     *
      * Shuts down all resources used for peer replication.
      */
     public void shutDown() {

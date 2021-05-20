@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 使用工具类 为了获取过去 X 毫秒内的计数
  * Utility class for getting a count in last X milliseconds.
  *
  * @author Karthik Ranganathan,Greg Kim

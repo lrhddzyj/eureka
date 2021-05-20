@@ -137,6 +137,7 @@ public class JerseyReplicationClient extends AbstractJerseyEurekaHttpClient impl
         jerseyClient.destroyResources();
     }
 
+    //创建复制客户端
     public static JerseyReplicationClient createReplicationClient(EurekaServerConfig config, ServerCodecs serverCodecs, String serviceUrl) {
         String name = JerseyReplicationClient.class.getSimpleName() + ": " + serviceUrl + "apps/: ";
 

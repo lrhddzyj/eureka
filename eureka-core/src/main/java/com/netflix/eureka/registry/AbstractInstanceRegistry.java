@@ -62,6 +62,8 @@ import org.slf4j.LoggerFactory;
 import static com.netflix.eureka.util.EurekaMonitors.*;
 
 /**
+ * TODO
+ * 处理所有的eurekaClient的注册请求
  * Handles all registry requests from eureka clients.
  *
  * <p>
@@ -122,11 +124,15 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
 
         this.renewsLastMin = new MeasuredRate(1000 * 60 * 1);
 
+        //默认30S之后 每隔30秒执行该任务
         this.deltaRetentionTimer.schedule(getDeltaRetentionTask(),
                 serverConfig.getDeltaRetentionTimerIntervalInMs(),
                 serverConfig.getDeltaRetentionTimerIntervalInMs());
     }
 
+    /**
+     * 初始化缓存对象
+     */
     @Override
     public synchronized void initializedResponseCache() {
         if (responseCache == null) {
@@ -134,6 +140,10 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
         }
     }
 
+    /**
+     * 初始化 远程区域注册信息 存疑
+     * @throws MalformedURLException
+     */
     protected void initRemoteRegionRegistry() throws MalformedURLException {
         Map<String, String> remoteRegionUrlsWithName = serverConfig.getRemoteRegionUrlsWithName();
         if (!remoteRegionUrlsWithName.isEmpty()) {
@@ -168,6 +178,7 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
     }
 
     /**
+     * 清理注册
      * Completely clear the registry.
      */
     @Override

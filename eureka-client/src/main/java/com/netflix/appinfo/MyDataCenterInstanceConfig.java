@@ -21,6 +21,9 @@ import com.netflix.appinfo.providers.MyDataCenterInstanceConfigProvider;
 import javax.inject.Singleton;
 
 /**
+ *
+ * Eureka server 作为（eureka-client）实例配置
+ *
  * An {@link InstanceInfo} configuration for the non-AWS datacenter.
  *
  * @author Karthik Ranganathan

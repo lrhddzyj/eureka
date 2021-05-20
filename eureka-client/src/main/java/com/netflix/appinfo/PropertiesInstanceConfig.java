@@ -28,6 +28,8 @@ import org.apache.commons.configuration.Configuration;
 import static com.netflix.appinfo.PropertyBasedInstanceConfigConstants.*;
 
 /**
+ * 根据文件配置namespace动态调整加载属性配置
+ *
  * A properties based {@link InstanceInfo} configuration.
  *
  * <p>

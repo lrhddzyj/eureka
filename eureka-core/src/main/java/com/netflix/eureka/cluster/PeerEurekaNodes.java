@@ -73,6 +73,7 @@ public class PeerEurekaNodes {
     }
 
     public void start() {
+        //PeerNodesUpdater 线程池 猜测是未来更新集群信息
         taskExecutor = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactory() {
                     @Override
@@ -84,7 +85,9 @@ public class PeerEurekaNodes {
                 }
         );
         try {
+            //先更新一次集群信息
             updatePeerEurekaNodes(resolvePeerUrls());
+            //创建一个任务用于更新集群
             Runnable peersUpdateTask = new Runnable() {
                 @Override
                 public void run() {
@@ -96,6 +99,7 @@ public class PeerEurekaNodes {
 
                 }
             };
+            //提交执行任务
             taskExecutor.scheduleWithFixedDelay(
                     peersUpdateTask,
                     serverConfig.getPeerEurekaNodesUpdateIntervalMs(),
@@ -123,6 +127,8 @@ public class PeerEurekaNodes {
     }
 
     /**
+     * 从配置中（不一定是本地的配置文件）解析eureka server 节点的url配置
+     *
      * Resolve peer URLs.
      *
      * @return peer URLs with node's own URL filtered out
@@ -130,6 +136,7 @@ public class PeerEurekaNodes {
     protected List<String> resolvePeerUrls() {
         InstanceInfo myInfo = applicationInfoManager.getInfo();
         String zone = InstanceInfo.getZone(clientConfig.getAvailabilityZones(clientConfig.getRegion()), myInfo);
+        //从配置文件中获取eurekaServer的url配置
         List<String> replicaUrls = EndpointUtils
                 .getDiscoveryServiceUrls(clientConfig, zone, new EndpointUtils.InstanceInfoBasedUrlRandomizer(myInfo));
 
@@ -145,6 +152,13 @@ public class PeerEurekaNodes {
     }
 
     /**
+     * 更新eurekaServer集群的节点信息
+     *
+     * A <-> B <-> C
+             ↑
+     *       D
+     * D可以配置B就可以感知到A和C
+     *
      * Given new set of replica URLs, destroy {@link PeerEurekaNode}s no longer available, and
      * create new ones.
      *
@@ -156,8 +170,10 @@ public class PeerEurekaNodes {
             return;
         }
 
+        //从原来的排除新的剩下需要关闭的
         Set<String> toShutdown = new HashSet<>(peerEurekaNodeUrls);
         toShutdown.removeAll(newPeerUrls);
+        //从新的排除原来的 剩下的就是要增加的
         Set<String> toAdd = new HashSet<>(newPeerUrls);
         toAdd.removeAll(peerEurekaNodeUrls);
 
@@ -194,6 +210,7 @@ public class PeerEurekaNodes {
         this.peerEurekaNodeUrls = new HashSet<>(newPeerUrls);
     }
 
+    //创建PeerEurekaNode 并开辟新的资源处理新的节点
     protected PeerEurekaNode createPeerEurekaNode(String peerEurekaNodeUrl) {
         HttpReplicationClient replicationClient = JerseyReplicationClient.createReplicationClient(serverConfig, serverCodecs, peerEurekaNodeUrl);
         String targetHost = hostFromUrl(peerEurekaNodeUrl);

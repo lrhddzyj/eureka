@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * 默认的eurekaServer的配置
  * A default implementation of eureka server configuration as required by
  * {@link EurekaServerConfig}.
  *
@@ -70,6 +70,7 @@ public class DefaultEurekaServerConfig implements EurekaServerConfig {
             .getLogger(DefaultEurekaServerConfig.class);
     private static final DynamicPropertyFactory configInstance = com.netflix.config.DynamicPropertyFactory
             .getInstance();
+    //eureka-server的配置配置文件的获取，默认为eureka-server.properties
     private static final DynamicStringProperty EUREKA_PROPS_FILE = DynamicPropertyFactory
             .getInstance().getStringProperty("eureka.server.props",
                     "eureka-server");
@@ -101,6 +102,7 @@ public class DefaultEurekaServerConfig implements EurekaServerConfig {
         init();
     }
 
+    //加载配置文件的属性设置
     private void init() {
         String env = ConfigurationManager.getConfigInstance().getString(
                 EUREKA_ENVIRONMENT, TEST);
@@ -111,6 +113,7 @@ public class DefaultEurekaServerConfig implements EurekaServerConfig {
         try {
             // ConfigurationManager
             // .loadPropertiesFromResources(eurekaPropsFile);
+            //从配置文件中加载配置的到 ConfigurationManager
             ConfigurationManager
                     .loadCascadedPropertiesFromResources(eurekaPropsFile);
         } catch (IOException e) {

@@ -19,6 +19,9 @@ package com.netflix.eureka.lease;
 import com.netflix.eureka.registry.AbstractInstanceRegistry;
 
 /**
+ *
+ * 方便计算某个对象的状态的租约
+ *
  * Describes a time-based availability of a {@link T}. Purpose is to avoid
  * accumulation of instances in {@link AbstractInstanceRegistry} as result of ungraceful
  * shutdowns that is not uncommon in AWS environments.

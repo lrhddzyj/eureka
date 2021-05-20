@@ -69,8 +69,11 @@ public class EurekaClientServerRestIntegrationTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
+        //注入eureka的配置
         injectEurekaConfiguration();
+
         startServer();
+        //创建EurekaServer的配置
         createEurekaServerConfig();
 
         httpClientFactory = JerseyEurekaHttpClientFactory.newBuilder()
@@ -84,7 +87,9 @@ public class EurekaClientServerRestIntegrationTest {
 
         jerseyEurekaClient = httpClientFactory.newClient(new DefaultEndpoint(eurekaServiceUrl));
 
+        //创建默认服务编解码包装器
         ServerCodecs serverCodecs = new DefaultServerCodecs(eurekaServerConfig);
+        //创建了一个复制信息的客户端
         jerseyReplicationClient = JerseyReplicationClient.createReplicationClient(
                 eurekaServerConfig,
                 serverCodecs,
@@ -106,6 +111,7 @@ public class EurekaClientServerRestIntegrationTest {
         }
     }
 
+    //测试注册
     @Test
     public void testRegistration() throws Exception {
         InstanceInfo instanceInfo = instanceInfoIt.next();
@@ -232,15 +238,23 @@ public class EurekaClientServerRestIntegrationTest {
     }
 
     private static void startServer() throws Exception {
-        File warFile = findWar();
+//        File warFile = findWar();
+//
+//        server = new Server(8080);
+//
+//        WebAppContext webapp = new WebAppContext();
+//        webapp.setContextPath("/");
+//        webapp.setWar(warFile.getAbsolutePath());
+//        server.setHandler(webapp);
+//
+//        server.start();
 
         server = new Server(8080);
-
-        WebAppContext webapp = new WebAppContext();
-        webapp.setContextPath("/");
-        webapp.setWar(warFile.getAbsolutePath());
-        server.setHandler(webapp);
-
+        WebAppContext webAppCtx = new WebAppContext(new File("./eureka-server/src/main/webapp").getAbsolutePath(), "/");
+        webAppCtx.setDescriptor(new File("./eureka-server/src/main/webapp/WEB-INF/web.xml").getAbsolutePath());
+        webAppCtx.setResourceBase(new File("./eureka-server/src/main/resources").getAbsolutePath());
+        webAppCtx.setClassLoader(Thread.currentThread().getContextClassLoader());
+        server.setHandler(webAppCtx);
         server.start();
 
         eurekaServiceUrl = "http://localhost:8080/v2";
@@ -277,9 +291,12 @@ public class EurekaClientServerRestIntegrationTest {
     private static void createEurekaServerConfig() {
         eurekaServerConfig = mock(EurekaServerConfig.class);
 
+
+        //集群相关配置
         // Cluster management related
         when(eurekaServerConfig.getPeerEurekaNodesUpdateIntervalMs()).thenReturn(1000);
 
+        //复制逻辑的相关配置
         // Replication logic related
         when(eurekaServerConfig.shouldSyncWhenTimestampDiffers()).thenReturn(true);
         when(eurekaServerConfig.getMaxTimeForReplication()).thenReturn(1000);
@@ -288,6 +305,7 @@ public class EurekaClientServerRestIntegrationTest {
         when(eurekaServerConfig.getMaxThreadsForPeerReplication()).thenReturn(1);
         when(eurekaServerConfig.shouldBatchReplication()).thenReturn(true);
 
+        //集群的节点配置
         // Peer node connectivity (used by JerseyReplicationClient)
         when(eurekaServerConfig.getPeerNodeTotalConnections()).thenReturn(1);
         when(eurekaServerConfig.getPeerNodeTotalConnectionsPerHost()).thenReturn(1);

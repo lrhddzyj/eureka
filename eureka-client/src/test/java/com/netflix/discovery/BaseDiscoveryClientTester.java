@@ -44,6 +44,7 @@ public abstract class BaseDiscoveryClientTester {
     public MockRemoteEurekaServer mockLocalEurekaServer = new MockRemoteEurekaServer();
     protected EurekaClient client;
 
+    //设置client的属性
     protected void setupProperties() {
         DiscoveryClientResource.setupDiscoveryClientConfig(mockLocalEurekaServer.getPort(),
                 MockRemoteEurekaServer.EUREKA_API_BASE_PATH);
