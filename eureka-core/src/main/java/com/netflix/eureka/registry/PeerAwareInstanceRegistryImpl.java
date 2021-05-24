@@ -160,7 +160,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     public void init(PeerEurekaNodes peerEurekaNodes) throws Exception {
         this.numberOfReplicationsLastMin.start();//启动计数
         this.peerEurekaNodes = peerEurekaNodes;
-        //初始化一个缓存 存疑
+        //初始化缓存
         initializedResponseCache();
         //执行续约阈值更新任务 存疑
         scheduleRenewalThresholdUpdateTask();
@@ -413,6 +413,8 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
     }
 
     /**
+     * eurke
+     *
      * Registers the information about the {@link InstanceInfo} and replicates
      * this information to all peer eureka nodes. If this is replication event
      * from other replica nodes then it is not replicated.
@@ -430,6 +432,7 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
             leaseDuration = info.getLeaseInfo().getDurationInSecs();
         }
         super.register(info, leaseDuration, isReplication);
+        //复制到其它eurekaServer节点
         replicateToPeers(Action.Register, info.getAppName(), info.getId(), info, null, isReplication);
     }
 

@@ -86,6 +86,7 @@ public class ApplicationsResource {
      *            application.
      * @return information about a particular application.
      */
+    //入口在这里
     @Path("{appId}")
     public ApplicationResource getApplicationResource(
             @PathParam("version") String version,

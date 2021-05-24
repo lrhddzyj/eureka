@@ -119,6 +119,8 @@ public class ApplicationResource {
     }
 
     /**
+     *
+     *
      * Gets information about a particular instance of an application.
      *
      * @param id
@@ -131,6 +133,8 @@ public class ApplicationResource {
     }
 
     /**
+     * 向eurekaServer注册eurekaClient
+     *
      * Registers information about a particular instance for an
      * {@link com.netflix.discovery.shared.Application}.
      *
