@@ -519,6 +519,8 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
             // The self preservation mode is disabled, hence allowing the instances to expire.
             return true;
         }
+        //每分钟续约次数 see#updateRenewsPerMinThreshold()
+        //#getNumOfRenewsInLastMin 上一分钟心跳次数
         return numberOfRenewsPerMinThreshold > 0 && getNumOfRenewsInLastMin() > numberOfRenewsPerMinThreshold;
     }
 
