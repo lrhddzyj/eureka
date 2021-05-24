@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 使用工具类 为了获取过去 X 毫秒内的计数
+ * 使用工具类 为了获取过去 X 毫秒内的计数 （这个设计还是有点意思）
  * Utility class for getting a count in last X milliseconds.
  *
  * @author Karthik Ranganathan,Greg Kim
@@ -54,7 +54,7 @@ public class MeasuredRate {
                 @Override
                 public void run() {
                     try {
-                        // Zero out the current bucket.
+                        // Zero out the current bucket. 将currentBucket归0，并将原来的值赋值给到lastBucket
                         lastBucket.set(currentBucket.getAndSet(0));
                     } catch (Throwable e) {
                         logger.error("Cannot reset the Measured Rate", e);

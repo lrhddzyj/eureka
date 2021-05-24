@@ -123,6 +123,7 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
         this.recentCanceledQueue = new CircularQueue<Pair<Long, String>>(1000);
         this.recentRegisteredQueue = new CircularQueue<Pair<Long, String>>(1000);
 
+        //统计1分钟中内的心跳次数
         this.renewsLastMin = new MeasuredRate(1000 * 60 * 1);
 
         //默认30S之后 每隔30秒执行该任务

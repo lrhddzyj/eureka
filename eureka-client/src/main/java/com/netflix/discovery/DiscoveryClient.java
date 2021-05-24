@@ -896,6 +896,7 @@ public class DiscoveryClient implements EurekaClient {
     }
 
     /**
+     * 心跳（续约处理）
      * Renew with the eureka service by making the appropriate REST call
      */
     boolean renew() {
