@@ -350,6 +350,7 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
             read.unlock();
         }
 
+        //减少客户端期望续约数量
         synchronized (lock) {
             if (this.expectedNumberOfClientsSendingRenews > 0) {
                 // Since the client wants to cancel it, reduce the number of clients to send renews.
@@ -1205,6 +1206,7 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
         responseCache.invalidate(appName, vipAddress, secureVipAddress);
     }
 
+    //更新这个每分钟自我保护机制的阈值
     protected void updateRenewsPerMinThreshold() {
         this.numberOfRenewsPerMinThreshold = (int) (this.expectedNumberOfClientsSendingRenews
                 * (60.0 / serverConfig.getExpectedClientRenewalIntervalSeconds())

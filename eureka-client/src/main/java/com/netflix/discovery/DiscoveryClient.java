@@ -946,10 +946,12 @@ public class DiscoveryClient implements EurekaClient {
         if (isShutdown.compareAndSet(false, true)) {
             logger.info("Shutting down DiscoveryClient ...");
 
+            //移除监听
             if (statusChangeListener != null && applicationInfoManager != null) {
                 applicationInfoManager.unregisterStatusChangeListener(statusChangeListener.getId());
             }
 
+            //关闭定时任务
             cancelScheduledTasks();
 
             // If APPINFO was registered
@@ -957,6 +959,7 @@ public class DiscoveryClient implements EurekaClient {
                     && clientConfig.shouldRegisterWithEureka()
                     && clientConfig.shouldUnregisterOnShutdown()) {
                 applicationInfoManager.setInstanceStatus(InstanceStatus.DOWN);
+                //取消注册
                 unregister();
             }
 
