@@ -232,6 +232,8 @@ public class EurekaBootStrap implements ServletContextListener {
         //同步注册表
         int registryCount = registry.syncUp();
 
+
+        //
         registry.openForTraffic(applicationInfoManager, registryCount);
 
         // Register all monitoring statistics.

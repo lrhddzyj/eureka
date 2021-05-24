@@ -614,6 +614,21 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
         // We collect first all expired items, to evict them in random order. For large eviction sets,
         // if we do not that, we might wipe out whole apps before self preservation kicks in. By randomizing it,
         // the impact should be evenly distributed across all applications.
+        /**
+         * {
+         *   "serviceA":
+         *         {
+         *           "123":{"name":xx,"ip":xxx,"port":sss}
+         *         },
+         *   "serviceB":
+        *            {
+        *             "123":{"name":xx,"ip":xxx,"port":sss}
+        *           },
+         *
+         * }
+         */
+
+
         List<Lease<InstanceInfo>> expiredLeases = new ArrayList<>();
         for (Entry<String, Map<String, Lease<InstanceInfo>>> groupEntry : registry.entrySet()) {
             Map<String, Lease<InstanceInfo>> leaseMap = groupEntry.getValue();
@@ -630,13 +645,17 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
         // To compensate for GC pauses or drifting local time, we need to use current registry size as a base for
         // triggering self-preservation. Without that we would wipe out full registry.
         int registrySize = (int) getLocalRegistrySize();
+        //
         int registrySizeThreshold = (int) (registrySize * serverConfig.getRenewalPercentThreshold());
         int evictionLimit = registrySize - registrySizeThreshold;
 
+        //取一个最小的下线数量值，如果下线的数量值小于阈值则全部下线，如果大于阈值，则设置阈值为最大下线数量
         int toEvict = Math.min(expiredLeases.size(), evictionLimit);
+        //如果说需要下线的数量大于0
         if (toEvict > 0) {
             logger.info("Evicting {} items (expired={}, evictionLimit={})", toEvict, expiredLeases.size(), evictionLimit);
 
+            //随机下线某个实例
             Random random = new Random(System.currentTimeMillis());
             for (int i = 0; i < toEvict; i++) {
                 // Pick a random item (Knuth shuffle algorithm)
@@ -1210,6 +1229,7 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
     protected void updateRenewsPerMinThreshold() {
         this.numberOfRenewsPerMinThreshold = (int) (this.expectedNumberOfClientsSendingRenews
                 * (60.0 / serverConfig.getExpectedClientRenewalIntervalSeconds())
+                //心跳的百分比
                 * serverConfig.getRenewalPercentThreshold());
     }
 
@@ -1279,14 +1299,19 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry {
          * clock skew or gc for example) causes the actual eviction task to execute later than the desired time
          * according to the configured cycle.
          */
+        //计算时间范围
         long getCompensationTimeMs() {
+            //当前时间
             long currNanos = getCurrentTimeNano();
+            //上次执行时间
             long lastNanos = lastExecutionNanosRef.getAndSet(currNanos);
             if (lastNanos == 0l) {
                 return 0l;
             }
-
+            //距离上一次的时间间隔
             long elapsedMs = TimeUnit.NANOSECONDS.toMillis(currNanos - lastNanos);
+
+            //跟配置的驱逐（下线client）的配置时间对比
             long compensationTime = elapsedMs - serverConfig.getEvictionIntervalTimerInMs();
             return compensationTime <= 0l ? 0l : compensationTime;
         }

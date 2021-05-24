@@ -162,9 +162,9 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
         this.peerEurekaNodes = peerEurekaNodes;
         //初始化缓存
         initializedResponseCache();
-        //执行续约阈值更新任务 存疑
+        //执行续约阈值更新任务 -> 为了检测自我保护的启动
         scheduleRenewalThresholdUpdateTask();
-        //初始化远程区域注册表 存疑
+        //初始化远程区域注册表
         initRemoteRegionRegistry();
 
         try {
@@ -257,9 +257,19 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
         return count;
     }
 
+    /**
+     * 更新客户端数量和阈值
+     *
+     * #postInit 检测计算心跳次数 服务在线的检测
+     *
+     * @param applicationInfoManager
+     * @param count
+     */
+
     @Override
     public void openForTraffic(ApplicationInfoManager applicationInfoManager, int count) {
         // Renewals happen every 30 seconds and for a minute it should be a factor of 2.
+        //期望发送心跳的次数
         this.expectedNumberOfClientsSendingRenews = count;
         updateRenewsPerMinThreshold();
         logger.info("Got {} instances from neighboring DS node", count);
@@ -276,6 +286,8 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
         }
         logger.info("Changing status to UP");
         applicationInfoManager.setInstanceStatus(InstanceStatus.UP);
+
+
         super.postInit();
     }
 
