@@ -446,7 +446,7 @@ public class DiscoveryClient implements EurekaClient {
         //是否需要更新注册表
         if (clientConfig.shouldFetchRegistry()) {
             try {
-                //更新注册表（包含注册）
+                //更新注册表
                 boolean primaryFetchRegistryResult = fetchRegistry(false);
                 if (!primaryFetchRegistryResult) {
                     logger.info("Initial registry fetch from primary servers failed");
@@ -472,7 +472,7 @@ public class DiscoveryClient implements EurekaClient {
 
         if (clientConfig.shouldRegisterWithEureka() && clientConfig.shouldEnforceRegistrationAtInit()) {
             try {
-                //想eurekaServer注册
+                //eurekaServer注册
                 if (!register() ) {
                     throw new IllegalStateException("Registration error at startup. Invalid server response.");
                 }
@@ -1174,6 +1174,7 @@ public class DiscoveryClient implements EurekaClient {
             } else {
                 logger.warn("Cannot acquire update lock, aborting getAndUpdateDelta");
             }
+            //检测本地的applications是否与远程的appsHashCode是否一致
             // There is a diff in number of instances for some reason
             if (!reconcileHashCode.equals(delta.getAppsHashCode()) || clientConfig.shouldLogDeltaDiff()) {
                 reconcileAndLogDifference(delta, reconcileHashCode);  // this makes a remoteCall
@@ -1216,6 +1217,7 @@ public class DiscoveryClient implements EurekaClient {
      * @throws Throwable
      *             on any error.
      */
+    //重新从eurekaServer中全量拉起注册表数据并覆盖本地的数据
     private void reconcileAndLogDifference(Applications delta, String reconcileHashCode) throws Throwable {
         logger.debug("The Reconcile hashcodes do not match, client : {}, server : {}. Getting the full registry",
                 reconcileHashCode, delta.getAppsHashCode());
@@ -1224,6 +1226,7 @@ public class DiscoveryClient implements EurekaClient {
 
         long currentUpdateGeneration = fetchRegistryGeneration.get();
 
+        //全量获取注册表
         EurekaHttpResponse<Applications> httpResponse = clientConfig.getRegistryRefreshSingleVipAddress() == null
                 ? eurekaTransport.queryClient.getApplications(remoteRegionsRef.get())
                 : eurekaTransport.queryClient.getVip(clientConfig.getRegistryRefreshSingleVipAddress(), remoteRegionsRef.get());

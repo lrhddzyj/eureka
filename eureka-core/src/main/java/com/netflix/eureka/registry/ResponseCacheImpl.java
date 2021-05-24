@@ -146,6 +146,7 @@ public class ResponseCacheImpl implements ResponseCache {
                                 }
                             }
                         })
+                       //获取缓存-如果没有-则计算"[get-if-absent-compute]的原子语义
                         .build(new CacheLoader<Key, Value>() {
                             @Override
                             public Value load(Key key) throws Exception {
