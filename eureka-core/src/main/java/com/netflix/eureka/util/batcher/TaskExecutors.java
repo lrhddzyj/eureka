@@ -179,6 +179,7 @@ class TaskExecutors<ID, T> {
             super(workerName, isShutdown, metrics, processor, acceptorExecutor);
         }
 
+        //批处理线程执行
         @Override
         public void run() {
             try {

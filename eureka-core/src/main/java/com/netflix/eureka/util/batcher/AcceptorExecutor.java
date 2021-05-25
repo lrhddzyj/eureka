@@ -54,17 +54,20 @@ class AcceptorExecutor<ID, T> {
 
     private final AtomicBoolean isShutdown = new AtomicBoolean(false);
 
+    //接收任务的queue
     private final BlockingQueue<TaskHolder<ID, T>> acceptorQueue = new LinkedBlockingQueue<>();
     private final BlockingDeque<TaskHolder<ID, T>> reprocessQueue = new LinkedBlockingDeque<>();
     private final Thread acceptorThread;
 
     private final Map<ID, TaskHolder<ID, T>> pendingTasks = new HashMap<>();
+    //处理中的任务队列
     private final Deque<ID> processingOrder = new LinkedList<>();
 
     private final Semaphore singleItemWorkRequests = new Semaphore(0);
     private final BlockingQueue<TaskHolder<ID, T>> singleItemWorkQueue = new LinkedBlockingQueue<>();
 
     private final Semaphore batchWorkRequests = new Semaphore(0);
+    //批处理队列
     private final BlockingQueue<List<TaskHolder<ID, T>>> batchWorkQueue = new LinkedBlockingQueue<>();
 
     private final TrafficShaper trafficShaper;
@@ -121,6 +124,7 @@ class AcceptorExecutor<ID, T> {
         }
     }
 
+    //接收任务，放入接收队列
     void process(ID id, T task, long expiryTime) {
         acceptorQueue.add(new TaskHolder<ID, T>(id, task, expiryTime));
         acceptedTasks++;
@@ -180,6 +184,7 @@ class AcceptorExecutor<ID, T> {
         return singleItemWorkQueue.size() + batchWorkQueue.size();
     }
 
+    //接收任务线程处理 组织一批任务的逻辑
     class AcceptorRunner implements Runnable {
         @Override
         public void run() {
