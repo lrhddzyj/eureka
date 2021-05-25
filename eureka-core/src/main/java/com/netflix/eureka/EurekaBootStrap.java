@@ -204,7 +204,7 @@ public class EurekaBootStrap implements ServletContextListener {
             );
         }
 
-        //创建PeerEurekaNodes
+        //创建PeerEurekaNodes 集群
         PeerEurekaNodes peerEurekaNodes = getPeerEurekaNodes(
                 registry,
                 eurekaServerConfig,

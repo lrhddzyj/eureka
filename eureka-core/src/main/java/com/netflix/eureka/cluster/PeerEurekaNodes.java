@@ -99,7 +99,7 @@ public class PeerEurekaNodes {
 
                 }
             };
-            //提交执行任务
+            //默认每隔10分钟执行一次更新集群的任务
             taskExecutor.scheduleWithFixedDelay(
                     peersUpdateTask,
                     serverConfig.getPeerEurekaNodesUpdateIntervalMs(),
