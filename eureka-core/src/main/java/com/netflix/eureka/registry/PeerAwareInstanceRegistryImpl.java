@@ -513,12 +513,18 @@ public class PeerAwareInstanceRegistryImpl extends AbstractInstanceRegistry impl
         }
     }
 
+    /**
+     * 是否允许节点过期
+     * @return
+     */
     @Override
     public boolean isLeaseExpirationEnabled() {
+        //是否配置了开启自我保护
         if (!isSelfPreservationModeEnabled()) {
             // The self preservation mode is disabled, hence allowing the instances to expire.
             return true;
         }
+        //根据心跳次数和实例数计算是否允许摘除实例 -> 自我保护的实现
         //每分钟续约次数 see#updateRenewsPerMinThreshold()
         //#getNumOfRenewsInLastMin 上一分钟心跳次数
         return numberOfRenewsPerMinThreshold > 0 && getNumOfRenewsInLastMin() > numberOfRenewsPerMinThreshold;
